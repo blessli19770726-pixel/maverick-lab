@@ -5,86 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maverick 知識提純站</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
-        .container { background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 650px; }
+        /* --- 基礎版面樣式 (扶起原本質感) --- */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f5f5f7; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 600px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .title { color: #e53935; font-size: 26px; font-weight: bold; display: flex; align-items: center; }
-        .status-dot { color: #4caf50; font-size: 14px; }
-        .display-area { width: 100%; min-height: 200px; padding: 20px; background: #fafafa; border: 1px dashed #e0e0e0; border-radius: 12px; margin-bottom: 20px; font-size: 16px; line-height: 1.6; color: #333; box-sizing: border-box; }
-        textarea { width: 100%; height: 120px; padding: 15px; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; resize: none; transition: 0.3s; }
-        textarea:focus { border-color: #e53935; outline: none; box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.1); }
-        .btn-main { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 18px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; margin-bottom: 10px; }
-        .btn-red { background-color: #e53935; }
-        .btn-orange { background-color: #ff9800; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .btn-sub { padding: 12px; border: none; border-radius: 10px; font-size: 14px; cursor: pointer; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .title { color: #d32f2f; font-size: 24px; font-weight: bold; display: flex; align-items: center; }
+        .status-sync { color: #4caf50; font-size: 14px; display: flex; align-items: center; gap: 5px; }
+
+        /* --- 顯示與輸入區 --- */
+        .display-area { width: 100%; min-height: 200px; padding: 20px; background: #fafafa; border: 1px dashed #ccc; border-radius: 12px; margin-bottom: 20px; font-size: 16px; line-height: 1.6; color: #333; box-sizing: border-box; }
+        textarea { width: 100%; height: 120px; padding: 15px; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; resize: none; }
+        textarea:focus { border-color: #d32f2f; outline: none; }
+
+        /* --- 按鈕通用樣式 --- */
+        .btn { width: 100%; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
+        .btn:hover { opacity: 0.9; }
+
+        /* --- 主按鈕 (扶起東來) --- */
+        .btn-main { padding: 18px; font-size: 18px; margin-bottom: 10px; }
+        #addListBtn { background-color: #d32f2f; } /* 你的紅色按鈕 */
+        #analyzeBtn { background-color: #ff9800; }  /* 我們的橙色按鈕 */
+
+        /* --- 副按鈕群 (扶起西倒) --- */
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .btn-sub { padding: 12px; font-size: 14px; }
         .btn-blue { background-color: #1e88e5; }
         .btn-green { background-color: #43a047; }
         .btn-grey { background-color: #546e7a; }
-        #statusInfo { text-align: center; color: #888; font-size: 12px; margin-top: 10px; }
+
+        /* --- 留言功能區 (扶起留言！) --- */
+        .comment-section { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
+        .comment-header { font-size: 18px; color: #555; margin-bottom: 15px; font-weight: bold; }
+        #commentInput { height: 80px; } /* 留言專用小文字框 */
+        #commentList { list-style: none; padding: 0; }
+        .comment-item { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #eee; font-size: 14px; color: #555; line-height: 1.5; }
+        #statusUpdate { text-align: center; color: #888; font-size: 12px; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="title">🚀 Maverick 知識提純</div>
-            <div class="status-dot">● 雲端同步就緒</div>
+            <div class="status-sync">● 雲端同步就緒</div>
         </div>
 
-        <div class="display-area" id="output">等待提純結果...</div>
+        <div class="display-area" id="outputArea">等待提純結果...</div>
 
-        <textarea id="input" placeholder="在此貼上文章片段、PROMPT 素材或靈感..."></textarea>
+        <textarea id="mainInput" placeholder="在此貼上文章片段、PROMPT 素材或靈感..."></textarea>
 
-        <button class="btn-main btn-red" onclick="alert('已加入清單！')">加入待分析清單</button>
+        <button id="addListBtn" class="btn btn-main">加入待分析清單</button>
         
-        <button id="analyzeBtn" class="btn-main btn-orange">🚀 GEMINI 立即在線分析</button>
+        <button id="analyzeBtn" class="btn btn-main">🚀 GEMINI 立即在線分析</button>
 
         <div class="btn-group">
-            <button class="btn-sub btn-blue">📄 複製 AI 指令</button>
-            <button class="btn-sub btn-green">💾 存為 TXT</button>
-            <button class="btn-sub btn-grey">📝 存為 Markdown</button>
+            <button id="copyBtn" class="btn btn-sub btn-blue">📄 複製 AI 指令</button>
+            <button id="saveTxtBtn" class="btn btn-sub btn-green">💾 存為 TXT</button>
+            <button id="saveMdBtn" class="btn btn-sub btn-grey">📝 存為 Markdown</button>
         </div>
 
-        <div id="statusInfo">隱形安全通道模式已啟用</div>
+        <div class="comment-section">
+            <div class="comment-header">🗨️ 留言紀錄</div>
+            <textarea id="commentInput" placeholder="輸入你想記錄的想法或註記..."></textarea>
+            <button id="postCommentBtn" class="btn btn-sub btn-grey" style="width: auto; padding: 10px 20px;">發佈留言</button>
+            <ul id="commentList">
+                <li class="comment-item">測試留言：範例紀錄 1</li>
+            </ul>
+        </div>
+
+        <div id="statusUpdate">隱形安全通道模式已啟用</div>
     </div>
 
     <script>
+        // --- 立即分析邏輯 ---
         document.getElementById('analyzeBtn').addEventListener('click', async () => {
-            const content = document.getElementById('input').value;
-            const output = document.getElementById('output');
-            const status = document.getElementById('statusInfo');
+            const content = document.getElementById('mainInput').value;
+            const outputArea = document.getElementById('outputArea');
+            const status = document.getElementById('statusUpdate');
             
-            if (!content) {
-                alert("Maverick，請先輸入內容！");
-                return;
-            }
-
+            if (!content) { alert("Maverick，請先輸入內容！"); return; }
             status.innerText = "⏳ 正在通過隱形通道連結 Gemini...";
-            output.innerText = "正在思考中...";
+            outputArea.innerText = "正在思考中...";
             
             try {
                 const response = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: "請以此 Maverick 框架進行提純分析：" + content }] }]
+                        contents: [{ parts: [{ text: "請以此 Maverick 框架進行提純分析，並給予精簡的見解：" + content }] }]
                     })
                 });
-
                 const data = await response.json();
                 const result = data.candidates[0].content.parts[0].text;
-                
-                output.innerText = result;
+                outputArea.innerText = result;
                 status.innerText = "✅ 分析完成！";
             } catch (error) {
                 status.innerText = "❌ 連結失敗，請確認 Netlify 已完成部署。";
-                output.innerText = "出錯了，可能是通道還沒準備好，請等一分鐘後再試。";
+                outputArea.innerText = "出錯了，可能是通道還沒準備好，請等一分鐘後再試。";
             }
         });
-    </script>
-</body>
-</html>
-            alert("已加入待分析清單！");
+
+        // --- 你的原本按鈕邏輯 ---
+        document.getElementById('addListBtn').addEventListener('click', () => { alert("已加入清單！"); });
+        document.getElementById('copyBtn').addEventListener('click', () => { alert("已複製 AI 指令"); });
+        
+        // --- 留言功能邏輯 ---
+        document.getElementById('postCommentBtn').addEventListener('click', () => {
+            const comment = document.getElementById('commentInput').value;
+            if (comment) {
+                const list = document.getElementById('commentList');
+                const newItem = document.createElement('li');
+                newItem.className = 'comment-item';
+                newItem.innerText = comment;
+                list.prepend(newItem); // 加在最前面
+                document.getElementById('commentInput').value = ''; // 清空
+            }
         });
     </script>
 </body>
