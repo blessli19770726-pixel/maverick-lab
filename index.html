@@ -1,96 +1,34 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <title>我的極簡 AI 知識轉運站 - 持久記憶版</title>
-    <style>
-        body { background-color: #f4f7f6; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        #parent { width: 650px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h4 { line-height: 40px; margin-bottom: 15px; border-bottom: 2px solid #333; color: #FF3300; display: flex; justify-content: space-between; }
-        #box { width: 100%; min-height: 150px; padding: 20px; border: 1px dashed #ddd; margin-bottom: 20px; border-radius: 8px; box-sizing: border-box; }
-        #result-display { width: 100%; min-height: 100px; padding: 15px; background: #fff9f0; border: 1px solid #ff9800; border-radius: 8px; margin-bottom: 20px; display: none; line-height: 1.6; white-space: pre-wrap; color: #333; }
-        ul { list-style: none; padding: 0; }
-        li { background: #f9f9f9; padding: 12px; margin-bottom: 10px; border-left: 5px solid #FF3300; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .index-tag { color: #FF3300; font-weight: bold; margin-right: 10px; }
-        .del-btn { background-color: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-        .input-group { display: flex; flex-direction: column; gap: 10px; }
-        textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; height: 80px; resize: vertical; box-sizing: border-box; }
-        .btn-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
-        .post-btn { background: #FF3300; grid-column: span 3; padding: 15px; font-size: 16px; }
-        .analyze-btn { background: #ff9800; } /* 橙色按鍵 */
-        .ai-btn { background: #4285F4; }
-        .save-txt-btn { background: #28a745; }
-        .save-md-btn { background: #6c757d; grid-column: span 1; }
-        button:hover { opacity: 0.8; }
-    </style>
-</head>
-<body>
-
-    <div id="parent">
-        <h4><span>📝 知識清單</span> <small id="status" style="font-size: 12px; color: #28a745;">資料已自動儲存</small></h4>
-        
-        <div id="result-display"></div>
-
-        <div id="box">
-            <ul id="comment-list"></ul>
-        </div>
-        
-        <div class="input-group">
-            <textarea id="text" placeholder="在此輸入或從清單點擊進行分析..."></textarea>
-            <div class="btn-container">
-                <button class="post-btn" onclick="fnsubmit()">加入待分析清單</button>
-                <button class="analyze-btn" onclick="fnAnalyze()">🚀 在綫分析</button>
-                <button class="ai-btn" onclick="fnAI()">📋 複製指令</button>
-                <button class="save-txt-btn" onclick="saveFile('txt')">💾 TXT</button>
-                <button class="save-md-btn" onclick="saveFile('md')">📑 MD</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        window.onload = function() {
-            const savedData = localStorage.getItem('maverick_notes');
-            if (savedData) {
-                const notes = JSON.parse(savedData);
-                notes.forEach(content => createEntry(content));
-            }
-            reOrder();
-        };
-
-        function fnsubmit() {
-            var otext = document.getElementById("text");
-            if (otext.value.trim() === "") return;
-            createEntry(otext.value);
-            otext.value = "";
-            saveToLocal();
-            reOrder();
-        }
-
-        function createEntry(content) {
-            var olist = document.getElementById("comment-list");
-            var li = document.createElement("li");
-            li.innerHTML = '<div><span class="index-tag"></span><span class="msg-text">' + content.replace(/\n/g, '<br>') + '</span></div>' +
-                           '<button class="del-btn" onclick="removeComment(this)">刪除</button>';
-            // 點擊列表內容自動填入輸入框，方便在線分析
-            li.onclick = function(e) {
-                if(e.target.tagName !== 'BUTTON') {
-                    document.getElementById("text").value = content;
-                }
-            };
-            olist.appendChild(li);
-        }
-
-        // 新增的橙色按鍵功能：在線分析
+// 修改後的在線分析功能：確保 AI 讀得到清單資訊
         async function fnAnalyze() {
             const otext = document.getElementById("text");
             const resDisplay = document.getElementById("result-display");
-            const content = otext.value.trim();
+            
+            // 1. 抓取輸入框內容
+            const currentInput = otext.value.trim();
+            
+            // 2. 抓取留言區（清單）所有內容
+            const msgs = document.getElementsByClassName("msg-text");
+            let listContent = "";
+            for (let i = 0; i < msgs.length; i++) {
+                listContent += `項目 ${i + 1}: ${msgs[i].innerText}\n`;
+            }
 
-            if (!content) return alert("請先輸入文字或點擊清單項目");
+            if (!currentInput && !listContent) return alert("清單與輸入框皆無內容可供分析");
 
             resDisplay.style.display = "block";
-            resDisplay.innerText = "⏳ 正在分析中...";
+            resDisplay.innerText = "⏳ 正在提取 Maverick 知識清單核心（含留言區資訊）...";
+
+            // 3. 組合完整的 Prompt
+            const fullPrompt = `你現在是 Maverick 的知識提純助理。
+請針對以下【留言區清單】的所有內容，結合【當前輸入指令】，進行深度分析與提純。
+
+【留言區清單內容】：
+${listContent}
+
+【當前輸入指令】：
+${currentInput}
+
+請直接輸出分析結果，並保持專業、精確的提純格式。`;
 
             try {
                 const res = await fetch('/api/analyze', {
@@ -98,7 +36,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{
-                            parts: [{ text: "請以首席助理身分提純以下知識點：\n\n" + content }]
+                            parts: [{ text: fullPrompt }]
                         }]
                     })
                 });
@@ -110,60 +48,6 @@
                     throw new Error(data.error || "分析失敗");
                 }
             } catch (e) {
-                resDisplay.innerText = "❌ 錯誤：" + e.message;
+                resDisplay.innerText = "❌ 錯誤：無法連線至分析通道，請檢查 Netlify 部署狀態。";
             }
         }
-
-        function removeComment(btn) {
-            btn.parentNode.remove();
-            saveToLocal();
-            reOrder();
-        }
-
-        function reOrder() {
-            var tags = document.getElementsByClassName("index-tag");
-            for (var i = 0; i < tags.length; i++) { tags[i].innerText = (i + 1) + ". "; }
-        }
-
-        function saveToLocal() {
-            const msgs = document.getElementsByClassName("msg-text");
-            const dataToSave = [];
-            for (let i = 0; i < msgs.length; i++) {
-                dataToSave.push(msgs[i].innerHTML.replace(/<br>/g, '\n'));
-            }
-            localStorage.setItem('maverick_notes', JSON.stringify(dataToSave));
-            document.getElementById("status").innerText = "資料已自動儲存 v";
-            setTimeout(() => { document.getElementById("status").innerText = "資料已自動儲存"; }, 2000);
-        }
-
-        function fnAI() {
-            var msgs = document.getElementsByClassName("msg-text");
-            var comments = [];
-            for (var i = 0; i < msgs.length; i++) { comments.push((i+1) + ". " + msgs[i].innerText); }
-            if (comments.length === 0) return;
-            var prompt = "卡特列，請分析以下資料：\n\n" + comments.join("\n");
-            navigator.clipboard.writeText(prompt).then(() => alert("指令已複製！"));
-        }
-
-        function saveFile(type) {
-            var msgs = document.getElementsByClassName("msg-text");
-            if (msgs.length === 0) return;
-            var content = "";
-            var fileName = "Maverick_Notes_" + new Date().getTime();
-            if (type === 'txt') {
-                for (var i = 0; i < msgs.length; i++) { content += (i + 1) + ". " + msgs[i].innerText + "\n\n"; }
-                fileName += ".txt";
-            } else {
-                content = "# 知識分析日誌\n\n";
-                for (var i = 0; i < msgs.length; i++) { content += "### 項目 " + (i + 1) + "\n> " + msgs[i].innerText + "\n\n---\n"; }
-                fileName += ".md";
-            }
-            var blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-            var link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = fileName;
-            link.click();
-        }
-    </script>
-</body>
-</html>
