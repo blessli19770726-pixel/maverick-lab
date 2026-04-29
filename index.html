@@ -3,104 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maverick 知識提純站</title>
+    <title>Maverick 知識提純</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f5f5f7; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 600px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .title { color: #d32f2f; font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .status-sync { color: #4caf50; font-size: 13px; font-weight: normal; }
+        body { font-family: sans-serif; background-color: #f5f5f5; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .title { color: #d32f2f; font-size: 20px; font-weight: bold; }
+        .status { color: #4caf50; font-size: 12px; }
 
-        /* --- 核心知識清單顯示區 (扶回原本的樣子) --- */
-        #listContainer { margin-bottom: 20px; min-height: 50px; }
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-left: 4px solid #ff5252; border-bottom: 1px solid #f0f0f0; margin-bottom: 8px; transition: 0.2s; }
-        .list-item:hover { background: #fff9f9; }
-        .item-text { flex-grow: 1; font-size: 16px; color: #333; margin-right: 15px; }
-        .delete-btn { background: #ff5252; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        /* --- 這是你最想要的清單樣式 --- */
+        #listContainer { margin-bottom: 15px; }
+        .list-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 12px; margin-bottom: 10px; background: #fff; 
+            border-left: 5px solid #ff5252; border-bottom: 1px solid #eee;
+            font-size: 16px;
+        }
+        .delete-btn { background: #ff5252; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
 
-        /* --- Gemini 即時分析結果區 --- */
-        #aiResultBox { width: 100%; padding: 15px; background: #fff9f0; border: 1px dashed #ff9800; border-radius: 12px; margin-bottom: 20px; font-size: 15px; display: none; line-height: 1.6; }
+        /* --- Gemini 顯示氣泡 --- */
+        #aiBox { 
+            padding: 15px; background: #fff9f0; border: 1px dashed #ff9800; 
+            border-radius: 10px; margin-bottom: 15px; display: none; color: #663c00;
+        }
 
-        textarea { width: 100%; height: 100px; padding: 15px; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; resize: none; }
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 18px; cursor: pointer; font-weight: bold; color: white; margin-bottom: 10px; transition: 0.3s; }
-        #addListBtn { background-color: #ff3d00; }
-        #analyzeBtn { background-color: #ff9800; }
-        
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .btn-sub { padding: 12px; font-size: 14px; border-radius: 8px; border: none; cursor: pointer; color: white; font-weight: bold; }
-        .blue { background: #2196f3; } .green { background: #4caf50; } .grey { background: #757575; }
-        #statusUpdate { text-align: center; color: #999; font-size: 12px; margin-top: 15px; }
+        textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; color: white; margin-top: 10px; cursor: pointer; }
+        .btn-red { background-color: #ff3d00; }
+        .btn-orange { background-color: #ff9800; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="title">📝 知識清單</div>
-            <div class="status-sync">資料已自動儲存</div>
+            <div class="status">資料已自動儲存</div>
         </div>
 
-        <div id="listContainer"></div>
+        <div id="listContainer"></div> <div id="aiBox"></div> <textarea id="mainInput" placeholder="在此貼上需要分析的文本..."></textarea>
 
-        <div id="aiResultBox"></div>
-
-        <textarea id="mainInput" placeholder="在此貼上文章片段、PROMPT 素材或靈感..."></textarea>
-
-        <button id="addListBtn" class="btn">加入待分析清單</button>
-        <button id="analyzeBtn" class="btn">🚀 GEMINI 立即在線分析</button>
-
-        <div class="btn-group">
-            <button class="btn-sub blue">📄 複製 AI 指令</button>
-            <button class="btn-sub green">💾 存為 TXT</button>
-            <button class="btn-sub grey">📝 存為 Markdown</button>
-        </div>
-
-        <div id="statusUpdate">隱形安全通道模式已啟用</div>
+        <button id="addBtn" class="btn btn-red">加入待分析清單</button>
+        <button id="aiBtn" class="btn btn-orange">🚀 GEMINI 立即在線分析</button>
     </div>
 
     <script>
         const input = document.getElementById('mainInput');
-        const listContainer = document.getElementById('listContainer');
-        const aiBox = document.getElementById('aiResultBox');
-        const status = document.getElementById('statusUpdate');
+        const list = document.getElementById('listContainer');
+        const aiBox = document.getElementById('aiBox');
 
-        // --- 1. 原本的「加入清單」邏輯 ---
-        document.getElementById('addListBtn').addEventListener('click', () => {
-            const text = input.value.trim();
-            if (!text) return;
-
+        // 功能 1：加入清單 (恢復你原本最愛的樣子)
+        document.getElementById('addBtn').addEventListener('click', () => {
+            const val = input.value.trim();
+            if(!val) return;
             const div = document.createElement('div');
             div.className = 'list-item';
-            div.innerHTML = `
-                <span class="item-text">${text}</span>
-                <button class="delete-btn" onclick="this.parentElement.remove()">刪除</button>
-            `;
-            listContainer.appendChild(div);
-            input.value = ''; // 清空輸入
+            div.innerHTML = `<span>${val}</span><button class="delete-btn" onclick="this.parentElement.remove()">刪除</button>`;
+            list.appendChild(div);
+            input.value = '';
+            aiBox.style.display = "none"; // 清空輸入時順便收起 AI 框
         });
 
-        // --- 2. 新增的「立即分析」邏輯 ---
-        document.getElementById('analyzeBtn').addEventListener('click', async () => {
+        // 功能 2：Gemini 分析 (連接你的 Netlify Edge Function)
+        document.getElementById('aiBtn').addEventListener('click', async () => {
             const content = input.value.trim();
-            if (!content) { alert("Maverick，請先輸入內容！"); return; }
+            if(!content) return alert("請輸入內容");
 
             aiBox.style.display = "block";
-            aiBox.innerText = "⏳ 正在提取 Maverick 框架見解...";
-            status.innerText = "正在通過隱形通道...";
+            aiBox.innerText = "⚡ 通道連接中...";
 
             try {
-                const response = await fetch('/api/analyze', {
+                const res = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: "請以此 Maverick 框架進行提純分析：" + content }] }]
-                    })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: content }] }] })
                 });
-                const data = await response.json();
+                const data = await res.json();
                 aiBox.innerText = data.candidates[0].content.parts[0].text;
-                status.innerText = "✅ 分析完成！";
-            } catch (error) {
-                aiBox.innerText = "通道暫時塞車，請確認部署後再試一次。";
-                status.innerText = "❌ 通道異常";
+            } catch (e) {
+                aiBox.innerText = "❌ 通道暫時塞車，請確認 Netlify 部署狀態。";
             }
         });
     </script>
