@@ -4,7 +4,7 @@ export default async (request, context) => {
 
   // 根據 2026/04 最新清單，Gemini 3 Pro 已停用
   // 我們改用具備進階智慧的 Gemini 3.1 Pro 預覽版
-  const model = "gemini-3.1-pro-preview"; 
+  const model = "Gemini 2.5 Flash-Lite"; 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   try {
