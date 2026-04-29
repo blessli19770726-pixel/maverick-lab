@@ -1,9 +1,11 @@
 export default async (request, context) => {
   const apiKey = Netlify.env.get("GEMINI_API_KEY");
-  const url = new URL(request.url);
   const body = await request.json();
 
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+  // 指向目前最穩定的 Gemini 2.0 Flash 節點
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+  const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)
