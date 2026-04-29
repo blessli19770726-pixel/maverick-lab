@@ -1,88 +1,169 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maverick 知識提純</title>
+    <title>我的極簡 AI 知識轉運站 - 持久記憶版</title>
     <style>
-        body { font-family: sans-serif; background-color: #f5f5f5; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .title { color: #d32f2f; font-size: 20px; font-weight: bold; }
-        .status { color: #4caf50; font-size: 12px; }
-
-        /* --- 這是你最想要的清單樣式 --- */
-        #listContainer { margin-bottom: 15px; }
-        .list-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 12px; margin-bottom: 10px; background: #fff; 
-            border-left: 5px solid #ff5252; border-bottom: 1px solid #eee;
-            font-size: 16px;
-        }
-        .delete-btn { background: #ff5252; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
-
-        /* --- Gemini 顯示氣泡 --- */
-        #aiBox { 
-            padding: 15px; background: #fff9f0; border: 1px dashed #ff9800; 
-            border-radius: 10px; margin-bottom: 15px; display: none; color: #663c00;
-        }
-
-        textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; color: white; margin-top: 10px; cursor: pointer; }
-        .btn-red { background-color: #ff3d00; }
-        .btn-orange { background-color: #ff9800; }
+        body { background-color: #f4f7f6; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        #parent { width: 650px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h4 { line-height: 40px; margin-bottom: 15px; border-bottom: 2px solid #333; color: #FF3300; display: flex; justify-content: space-between; }
+        #box { width: 100%; min-height: 150px; padding: 20px; border: 1px dashed #ddd; margin-bottom: 20px; border-radius: 8px; box-sizing: border-box; }
+        #result-display { width: 100%; min-height: 100px; padding: 15px; background: #fff9f0; border: 1px solid #ff9800; border-radius: 8px; margin-bottom: 20px; display: none; line-height: 1.6; white-space: pre-wrap; color: #333; }
+        ul { list-style: none; padding: 0; }
+        li { background: #f9f9f9; padding: 12px; margin-bottom: 10px; border-left: 5px solid #FF3300; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .index-tag { color: #FF3300; font-weight: bold; margin-right: 10px; }
+        .del-btn { background-color: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .input-group { display: flex; flex-direction: column; gap: 10px; }
+        textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; height: 80px; resize: vertical; box-sizing: border-box; }
+        .btn-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+        .post-btn { background: #FF3300; grid-column: span 3; padding: 15px; font-size: 16px; }
+        .analyze-btn { background: #ff9800; } /* 橙色按鍵 */
+        .ai-btn { background: #4285F4; }
+        .save-txt-btn { background: #28a745; }
+        .save-md-btn { background: #6c757d; grid-column: span 1; }
+        button:hover { opacity: 0.8; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="title">📝 知識清單</div>
-            <div class="status">資料已自動儲存</div>
+
+    <div id="parent">
+        <h4><span>📝 知識清單</span> <small id="status" style="font-size: 12px; color: #28a745;">資料已自動儲存</small></h4>
+        
+        <div id="result-display"></div>
+
+        <div id="box">
+            <ul id="comment-list"></ul>
         </div>
-
-        <div id="listContainer"></div> <div id="aiBox"></div> <textarea id="mainInput" placeholder="在此貼上需要分析的文本..."></textarea>
-
-        <button id="addBtn" class="btn btn-red">加入待分析清單</button>
-        <button id="aiBtn" class="btn btn-orange">🚀 GEMINI 立即在線分析</button>
+        
+        <div class="input-group">
+            <textarea id="text" placeholder="在此輸入或從清單點擊進行分析..."></textarea>
+            <div class="btn-container">
+                <button class="post-btn" onclick="fnsubmit()">加入待分析清單</button>
+                <button class="analyze-btn" onclick="fnAnalyze()">🚀 在綫分析</button>
+                <button class="ai-btn" onclick="fnAI()">📋 複製指令</button>
+                <button class="save-txt-btn" onclick="saveFile('txt')">💾 TXT</button>
+                <button class="save-md-btn" onclick="saveFile('md')">📑 MD</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const input = document.getElementById('mainInput');
-        const list = document.getElementById('listContainer');
-        const aiBox = document.getElementById('aiBox');
+        window.onload = function() {
+            const savedData = localStorage.getItem('maverick_notes');
+            if (savedData) {
+                const notes = JSON.parse(savedData);
+                notes.forEach(content => createEntry(content));
+            }
+            reOrder();
+        };
 
-        // 功能 1：加入清單 (恢復你原本最愛的樣子)
-        document.getElementById('addBtn').addEventListener('click', () => {
-            const val = input.value.trim();
-            if(!val) return;
-            const div = document.createElement('div');
-            div.className = 'list-item';
-            div.innerHTML = `<span>${val}</span><button class="delete-btn" onclick="this.parentElement.remove()">刪除</button>`;
-            list.appendChild(div);
-            input.value = '';
-            aiBox.style.display = "none"; // 清空輸入時順便收起 AI 框
-        });
+        function fnsubmit() {
+            var otext = document.getElementById("text");
+            if (otext.value.trim() === "") return;
+            createEntry(otext.value);
+            otext.value = "";
+            saveToLocal();
+            reOrder();
+        }
 
-        // 功能 2：Gemini 分析 (連接你的 Netlify Edge Function)
-        document.getElementById('aiBtn').addEventListener('click', async () => {
-            const content = input.value.trim();
-            if(!content) return alert("請輸入內容");
+        function createEntry(content) {
+            var olist = document.getElementById("comment-list");
+            var li = document.createElement("li");
+            li.innerHTML = '<div><span class="index-tag"></span><span class="msg-text">' + content.replace(/\n/g, '<br>') + '</span></div>' +
+                           '<button class="del-btn" onclick="removeComment(this)">刪除</button>';
+            // 點擊列表內容自動填入輸入框，方便在線分析
+            li.onclick = function(e) {
+                if(e.target.tagName !== 'BUTTON') {
+                    document.getElementById("text").value = content;
+                }
+            };
+            olist.appendChild(li);
+        }
 
-            aiBox.style.display = "block";
-            aiBox.innerText = "⚡ 通道連接中...";
+        // 新增的橙色按鍵功能：在線分析
+        async function fnAnalyze() {
+            const otext = document.getElementById("text");
+            const resDisplay = document.getElementById("result-display");
+            const content = otext.value.trim();
+
+            if (!content) return alert("請先輸入文字或點擊清單項目");
+
+            resDisplay.style.display = "block";
+            resDisplay.innerText = "⏳ 正在分析中...";
 
             try {
                 const res = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: content }] }] })
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: "請以首席助理身分提純以下知識點：\n\n" + content }]
+                        }]
+                    })
                 });
+
                 const data = await res.json();
-                aiBox.innerText = data.candidates[0].content.parts[0].text;
+                if (data.candidates) {
+                    resDisplay.innerText = data.candidates[0].content.parts[0].text;
+                } else {
+                    throw new Error(data.error || "分析失敗");
+                }
             } catch (e) {
-                aiBox.innerText = "❌ 通道暫時塞車，請確認 Netlify 部署狀態。";
+                resDisplay.innerText = "❌ 錯誤：" + e.message;
             }
-        });
+        }
+
+        function removeComment(btn) {
+            btn.parentNode.remove();
+            saveToLocal();
+            reOrder();
+        }
+
+        function reOrder() {
+            var tags = document.getElementsByClassName("index-tag");
+            for (var i = 0; i < tags.length; i++) { tags[i].innerText = (i + 1) + ". "; }
+        }
+
+        function saveToLocal() {
+            const msgs = document.getElementsByClassName("msg-text");
+            const dataToSave = [];
+            for (let i = 0; i < msgs.length; i++) {
+                dataToSave.push(msgs[i].innerHTML.replace(/<br>/g, '\n'));
+            }
+            localStorage.setItem('maverick_notes', JSON.stringify(dataToSave));
+            document.getElementById("status").innerText = "資料已自動儲存 v";
+            setTimeout(() => { document.getElementById("status").innerText = "資料已自動儲存"; }, 2000);
+        }
+
+        function fnAI() {
+            var msgs = document.getElementsByClassName("msg-text");
+            var comments = [];
+            for (var i = 0; i < msgs.length; i++) { comments.push((i+1) + ". " + msgs[i].innerText); }
+            if (comments.length === 0) return;
+            var prompt = "卡特列，請分析以下資料：\n\n" + comments.join("\n");
+            navigator.clipboard.writeText(prompt).then(() => alert("指令已複製！"));
+        }
+
+        function saveFile(type) {
+            var msgs = document.getElementsByClassName("msg-text");
+            if (msgs.length === 0) return;
+            var content = "";
+            var fileName = "Maverick_Notes_" + new Date().getTime();
+            if (type === 'txt') {
+                for (var i = 0; i < msgs.length; i++) { content += (i + 1) + ". " + msgs[i].innerText + "\n\n"; }
+                fileName += ".txt";
+            } else {
+                content = "# 知識分析日誌\n\n";
+                for (var i = 0; i < msgs.length; i++) { content += "### 項目 " + (i + 1) + "\n> " + msgs[i].innerText + "\n\n---\n"; }
+                fileName += ".md";
+            }
+            var blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+            var link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+        }
     </script>
 </body>
 </html>
