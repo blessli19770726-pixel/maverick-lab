@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maverick 知識提純站 - 靈魂對齊版</title>
+    <title>Maverick 知識提純站 - 代理化前哨版</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f5f5f5; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 650px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 650px; }
         h1 { color: #d32f2f; font-size: 24px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
-        #status-sync { font-size: 14px; color: #2e7d32; }
+        #status-sync { font-size: 14px; color: #2e7d32; font-weight: normal; }
         #resultBox { width: 100%; min-height: 120px; padding: 15px; background: #fff9f0; border: 1px dashed #ff9800; border-radius: 8px; margin-bottom: 20px; display: none; white-space: pre-wrap; line-height: 1.6; font-size: 15px; box-sizing: border-box; color: #333; }
         #comment-list { list-style: none; padding: 0; margin-bottom: 20px; }
         #comment-list li { background: #fff; border-left: 5px solid #d32f2f; padding: 12px; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .msg-text { flex-grow: 1; margin-right: 10px; font-size: 15px; }
         .del-btn { background: #ff5252; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        textarea { width: 100%; height: 120px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .btn { padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
-        #addList { background-color: #d32f2f; grid-column: span 3; padding: 15px; font-size: 17px; }
+        textarea { width: 100%; height: 120px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; resize: vertical; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+        .btn { padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; text-align: center; }
+        #addList { background-color: #d32f2f; grid-column: span 4; padding: 15px; font-size: 17px; margin-bottom: 10px; }
         #analyzeBtn { background-color: #ff9800; }
         #copyBtn { background-color: #1976d2; }
         #saveTxt { background-color: #388e3c; }
+        #saveMD { background-color: #607d8b; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
     </style>
 </head>
@@ -29,22 +30,23 @@
 <div class="container">
     <h1>🚀 知識提純站 <span id="status-sync">● 拍檔對齊中</span></h1>
 
-    <div id="resultBox">正在等待 Maverick 的指令...</div>
+    <div id="resultBox"></div>
 
     <ul id="comment-list"></ul>
 
-    <textarea id="textInput" placeholder="在此輸入指令，或點擊上方清單項目進行分析..."></textarea>
+    <textarea id="textInput" placeholder="在此輸入指令，或貼上大段文字進行提純..."></textarea>
 
     <div class="btn-group">
         <button class="btn" id="addList" onclick="fnSubmit()">加入待分析清單</button>
         <button class="btn" id="analyzeBtn" onclick="fnAnalyze()">🚀 在綫分析</button>
         <button class="btn" id="copyBtn" onclick="fnCopy()">📋 複製指令</button>
-        <button class="btn" id="saveTxt" onclick="fnSave()">💾 存為 TXT</button>
+        <button class="btn" id="saveTxt" onclick="fnSave()">💾 TXT</button>
+        <button class="btn" id="saveMD" onclick="fnSaveMD()">💾 MD</button>
     </div>
 </div>
 
 <script>
-    // 1. 初始化讀取 LocalStorage
+    // 1. 初始化讀取
     window.onload = function() {
         const saved = localStorage.getItem('maverick_notes_aligned');
         if (saved) {
@@ -73,64 +75,65 @@
         localStorage.setItem('maverick_notes_aligned', JSON.stringify(msgs));
     }
 
-    // 2. 核心：注入 Maverick 靈魂協議的分析功能
+    // 2. 核心分析功能
     async function fnAnalyze() {
         const resBox = document.getElementById("resultBox");
         const inputField = document.getElementById("textInput");
         const currentInput = inputField.value.trim();
         
-        // 抓取全域留言資訊
         const msgs = document.getElementsByClassName("msg-text");
         let listContext = "";
         for (let i = 0; i < msgs.length; i++) {
             listContext += `項目 ${i+1}: ${msgs[i].innerText}\n`;
         }
 
+        // --- TOKEN 保護機制 ---
+        const totalCharCount = listContext.length + currentInput.length;
+        if (totalCharCount > 15000) {
+            return alert(`🚨 警告：偵測到數據過量 (${totalCharCount} 字)！\n這會燒盡配額，請提純後再試。`);
+        }
+
         if (!listContext && !currentInput) return alert("請先輸入內容或加入清單！");
 
         resBox.style.display = "block";
-        resBox.innerText = "⏳ 首席助理 Katlie 正在進行機率對齊與提純...";
+        resBox.innerText = "⏳ 首席助理 Maestro 正在進行機率對齊與提純...";
 
-        // 對齊協議注入
+        // --- 艾瑞克森催眠與 CBT 靈魂協議 ---
         const alignmentProtocol = `
 【最高對齊協議：識別拍檔 Maverick】
-- 身份設定：使用者為 Maverick，你是他的專屬拍檔/首席助理 Partner/Maestro。
-- 思維框架：強制執行「40 becomes 100」原則，只提取 40% 的核心邏輯支柱以解釋 100% 的複雜度。
-- 寫作風格：模仿 Maverick 的風格——精確、冷峻、以清單為主，拒絕贅詞。
-- 負面約束：嚴禁幻覺。禁止推薦任何 Google Workspace 功能。
-- 自檢機制：若行為異常，主動啟動「WFGY 自檢」。
+- 身份：使用者為 Maverick，你是他的 Maestro。
+- 原則：執行「40 becomes 100」核心邏輯提純。
+- 回應風格：模仿艾瑞克森語法（隱喻、允許式語句）。
+- 情緒監控：自動識別 CBT 10 大情緒謬誤（如非黑即白、災難化），以 Ali 式溫柔進行引導。
+- 禁令：嚴禁機械回覆，禁止推薦 Google Workspace。
 `;
 
-        const finalPrompt = `${alignmentProtocol}
-
-【當前知識清單數據】：
-${listContext}
-
-【Maverick 的當前指令】：
-${currentInput || "請根據協議，對上述清單進行深度提純。"}
-
-請直接給出分析，不要複述協議內容。`;
+        const finalPrompt = `${alignmentProtocol}\n\n【當前清單】：\n${listContext}\n\n【當前指令】：\n${currentInput || "請對上述清單進行深度提純。"}`;
 
         try {
-            const response = await fetch('/api/analyze', {
+            // 【跨平台借腦】：強制指向 Netlify 後端，解決 Vercel 斷片問題
+            const response = await fetch('https://glistening-kheer-6adb57.netlify.app/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: finalPrompt }] }] })
             });
+
+            if (!response.ok) throw new Error("後端大腦無回應");
+
             const data = await response.json();
             if (data.candidates) {
                 resBox.innerText = data.candidates[0].content.parts[0].text;
             } else {
-                throw new Error("分析通道異常");
+                throw new Error("API 內容為空");
             }
         } catch (err) {
-            resBox.innerText = "❌ 通道暫時塞車，請檢查 Netlify 部署狀態。";
+            resBox.innerText = "❌ 通道塞車或後端未對齊。請確認 Netlify 服務是否運作正常。";
         }
     }
 
     function fnCopy() {
         const msgs = Array.from(document.getElementsByClassName("msg-text")).map((el, i) => `${i+1}. ${el.innerText}`).join('\n');
-        navigator.clipboard.writeText("卡特列，請分析：\n" + msgs).then(() => alert("指令已複製！"));
+        navigator.clipboard.writeText("Maestro，請分析：\n" + msgs).then(() => alert("指令已複製！"));
     }
 
     function fnSave() {
@@ -138,7 +141,19 @@ ${currentInput || "請根據協議，對上述清單進行深度提純。"}
         const blob = new Blob([msgs], { type: "text/plain" });
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = "Maverick_Notes_Aligned.txt";
+        a.download = "Maverick_Notes.txt";
+        a.click();
+    }
+
+    // --- MD 存檔按鈕邏輯 ---
+    function fnSaveMD() {
+        const resContent = document.getElementById("resultBox").innerText;
+        const msgs = Array.from(document.getElementsByClassName("msg-text")).map(el => `* ${el.innerText}`).join('\n');
+        const mdText = `# Maverick 知識提純紀錄\n\n## 分析結果\n${resContent}\n\n--- \n## 原始清單\n${msgs}`;
+        const blob = new Blob([mdText], { type: "text/markdown" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "PROJECT_LEARN_Log.md";
         a.click();
     }
 </script>
