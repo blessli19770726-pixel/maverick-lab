@@ -5,37 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maverick 知識提純站</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f5f5f5; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
-        h1 { color: #d32f2f; font-size: 24px; margin-bottom: 20px; display: flex; align-items: center; }
-        textarea { width: 100%; height: 150px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; resize: none; }
-        .display-area { width: 100%; min-height: 100px; padding: 15px; background: #fafafa; border: 1px dashed #ccc; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; word-wrap: break-word; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; margin-bottom: 10px; font-weight: bold; transition: 0.3s; color: white; }
-        #addList { background-color: #d32f2f; }
-        #analyzeBtn { background-color: #ff9800; }
-        #statusUpdate { text-align: center; color: #666; font-size: 14px; margin-top: 5px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .container { background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 650px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .title { color: #e53935; font-size: 26px; font-weight: bold; display: flex; align-items: center; }
+        .status-dot { color: #4caf50; font-size: 14px; }
+        .display-area { width: 100%; min-height: 200px; padding: 20px; background: #fafafa; border: 1px dashed #e0e0e0; border-radius: 12px; margin-bottom: 20px; font-size: 16px; line-height: 1.6; color: #333; box-sizing: border-box; }
+        textarea { width: 100%; height: 120px; padding: 15px; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; resize: none; transition: 0.3s; }
+        textarea:focus { border-color: #e53935; outline: none; box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.1); }
+        .btn-main { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 18px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; margin-bottom: 10px; }
+        .btn-red { background-color: #e53935; }
+        .btn-orange { background-color: #ff9800; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .btn-sub { padding: 12px; border: none; border-radius: 10px; font-size: 14px; cursor: pointer; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-blue { background-color: #1e88e5; }
+        .btn-green { background-color: #43a047; }
+        .btn-grey { background-color: #546e7a; }
+        #statusInfo { text-align: center; color: #888; font-size: 12px; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Maverick 知識提純</h1>
+        <div class="header">
+            <div class="title">🚀 Maverick 知識提純</div>
+            <div class="status-dot">● 雲端同步就緒</div>
+        </div>
+
+        <div class="display-area" id="output">等待提純結果...</div>
+
+        <textarea id="input" placeholder="在此貼上文章片段、PROMPT 素材或靈感..."></textarea>
+
+        <button class="btn-main btn-red" onclick="alert('已加入清單！')">加入待分析清單</button>
         
-        <div class="display-area" id="resultBox">等待分析結果...</div>
-        
-        <textarea placeholder="在此貼上文章片段、PROMPT 素材或靈感..."></textarea>
-        
-        <button id="addList" class="btn">加入待分析清單</button>
-        
-        <button id="analyzeBtn" class="btn">🚀 GEMINI 立即在線分析</button>
-        
-        <div id="statusUpdate">雲端同步就緒</div>
+        <button id="analyzeBtn" class="btn-main btn-orange">🚀 GEMINI 立即在線分析</button>
+
+        <div class="btn-group">
+            <button class="btn-sub btn-blue">📄 複製 AI 指令</button>
+            <button class="btn-sub btn-green">💾 存為 TXT</button>
+            <button class="btn-sub btn-grey">📝 存為 Markdown</button>
+        </div>
+
+        <div id="statusInfo">隱形安全通道模式已啟用</div>
     </div>
 
     <script>
         document.getElementById('analyzeBtn').addEventListener('click', async () => {
-            const content = document.querySelector('textarea').value;
-            const status = document.getElementById('statusUpdate');
-            const resultBox = document.getElementById('resultBox');
+            const content = document.getElementById('input').value;
+            const output = document.getElementById('output');
+            const status = document.getElementById('statusInfo');
             
             if (!content) {
                 alert("Maverick，請先輸入內容！");
@@ -43,32 +60,30 @@
             }
 
             status.innerText = "⏳ 正在通過隱形通道連結 Gemini...";
-            resultBox.innerText = "正在思考中...";
+            output.innerText = "正在思考中...";
             
             try {
-                // 這裡就是連結到我們剛才建好的 proxy.js
                 const response = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: "請以此 Maverick 框架進行提純分析，並給予精簡的見解：" + content }] }]
+                        contents: [{ parts: [{ text: "請以此 Maverick 框架進行提純分析：" + content }] }]
                     })
                 });
 
                 const data = await response.json();
                 const result = data.candidates[0].content.parts[0].text;
                 
-                resultBox.innerText = result;
+                output.innerText = result;
                 status.innerText = "✅ 分析完成！";
             } catch (error) {
                 status.innerText = "❌ 連結失敗，請確認 Netlify 已完成部署。";
-                resultBox.innerText = "出錯了，可能是通道還沒準備好。";
-                console.error(error);
+                output.innerText = "出錯了，可能是通道還沒準備好，請等一分鐘後再試。";
             }
         });
-
-        // 原本的按鈕邏輯可在此繼續擴充...
-        document.getElementById('addList').addEventListener('click', () => {
+    </script>
+</body>
+</html>
             alert("已加入待分析清單！");
         });
     </script>
