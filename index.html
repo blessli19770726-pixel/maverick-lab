@@ -1,170 +1,147 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>我的極簡 AI 知識轉運站 - 持久記憶版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maverick 知識提純站 - 靈魂對齊版</title>
     <style>
-        body { background-color: #f4f7f6; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        #parent { width: 650px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h4 { line-height: 40px; margin-bottom: 15px; border-bottom: 2px solid #333; color: #FF3300; display: flex; justify-content: space-between; }
-        #result-display { width: 100%; min-height: 100px; padding: 15px; background: #fff9f0; border: 1px solid #ff9800; border-radius: 8px; margin-bottom: 20px; display: none; line-height: 1.6; white-space: pre-wrap; color: #333; font-size: 15px; }
-        #box { width: 100%; min-height: 150px; padding: 20px; border: 1px dashed #ddd; margin-bottom: 20px; border-radius: 8px; box-sizing: border-box; }
-        ul { list-style: none; padding: 0; }
-        li { background: #f9f9f9; padding: 12px; margin-bottom: 10px; border-left: 5px solid #FF3300; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .index-tag { color: #FF3300; font-weight: bold; margin-right: 10px; }
-        .del-btn { background-color: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-        .input-group { display: flex; flex-direction: column; gap: 10px; }
-        textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; height: 100px; resize: vertical; box-sizing: border-box; font-size: 16px; }
-        .btn-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        button { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
-        .post-btn { background: #FF3300; grid-column: span 3; padding: 15px; font-size: 16px; }
-        .analyze-btn { background: #ff9800; } 
-        .ai-btn { background: #4285F4; }
-        .save-txt-btn { background: #28a745; }
-        .save-md-btn { background: #6c757d; }
-        button:hover { opacity: 0.8; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f5f5f5; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 650px; }
+        h1 { color: #d32f2f; font-size: 24px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        #status-sync { font-size: 14px; color: #2e7d32; }
+        #resultBox { width: 100%; min-height: 120px; padding: 15px; background: #fff9f0; border: 1px dashed #ff9800; border-radius: 8px; margin-bottom: 20px; display: none; white-space: pre-wrap; line-height: 1.6; font-size: 15px; box-sizing: border-box; color: #333; }
+        #comment-list { list-style: none; padding: 0; margin-bottom: 20px; }
+        #comment-list li { background: #fff; border-left: 5px solid #d32f2f; padding: 12px; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .msg-text { flex-grow: 1; margin-right: 10px; font-size: 15px; }
+        .del-btn { background: #ff5252; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        textarea { width: 100%; height: 120px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .btn { padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
+        #addList { background-color: #d32f2f; grid-column: span 3; padding: 15px; font-size: 17px; }
+        #analyzeBtn { background-color: #ff9800; }
+        #copyBtn { background-color: #1976d2; }
+        #saveTxt { background-color: #388e3c; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
     </style>
 </head>
 <body>
 
-    <div id="parent">
-        <h4><span>📝 知識清單</span> <small id="status" style="font-size: 12px; color: #28a745;">資料已自動儲存</small></h4>
-        
-        <div id="result-display"></div>
+<div class="container">
+    <h1>🚀 知識提純站 <span id="status-sync">● 拍檔對齊中</span></h1>
 
-        <div id="box">
-            <ul id="comment-list"></ul>
-        </div>
-        
-        <div class="input-group">
-            <textarea id="text" placeholder="貼上文本後加入清單，或直接在線分析..."></textarea>
-            <div class="btn-container">
-                <button class="post-btn" onclick="fnsubmit()">加入待分析清單</button>
-                <button class="analyze-btn" onclick="fnAnalyze()">🚀 在綫分析</button>
-                <button class="ai-btn" onclick="fnAI()">📋 複製指令</button>
-                <button class="save-txt-btn" onclick="saveFile('txt')">💾 TXT</button>
-                <button class="save-md-btn" onclick="saveFile('md')">📑 MD</button>
-            </div>
-        </div>
+    <div id="resultBox">正在等待 Maverick 的指令...</div>
+
+    <ul id="comment-list"></ul>
+
+    <textarea id="textInput" placeholder="在此輸入指令，或點擊上方清單項目進行分析..."></textarea>
+
+    <div class="btn-group">
+        <button class="btn" id="addList" onclick="fnSubmit()">加入待分析清單</button>
+        <button class="btn" id="analyzeBtn" onclick="fnAnalyze()">🚀 在綫分析</button>
+        <button class="btn" id="copyBtn" onclick="fnCopy()">📋 複製指令</button>
+        <button class="btn" id="saveTxt" onclick="fnSave()">💾 存為 TXT</button>
     </div>
+</div>
 
-    <script>
-        window.onload = function() {
-            const savedData = localStorage.getItem('maverick_notes');
-            if (savedData) {
-                const notes = JSON.parse(savedData);
-                notes.forEach(content => createEntry(content));
-            }
-            reOrder();
-        };
+<script>
+    // 1. 初始化讀取 LocalStorage
+    window.onload = function() {
+        const saved = localStorage.getItem('maverick_notes_aligned');
+        if (saved) {
+            JSON.parse(saved).forEach(txt => createItem(txt));
+        }
+    };
 
-        function fnsubmit() {
-            var otext = document.getElementById("text");
-            if (otext.value.trim() === "") return;
-            createEntry(otext.value);
-            otext.value = "";
-            saveToLocal();
-            reOrder();
+    function fnSubmit() {
+        const input = document.getElementById("textInput");
+        if (!input.value.trim()) return;
+        createItem(input.value);
+        input.value = "";
+        saveData();
+    }
+
+    function createItem(text) {
+        const list = document.getElementById("comment-list");
+        const li = document.createElement("li");
+        li.innerHTML = `<span class="msg-text">${text}</span><button class="del-btn" onclick="event.stopPropagation();this.parentElement.remove();saveData();">刪除</button>`;
+        li.onclick = function() { document.getElementById("textInput").value = text; };
+        list.appendChild(li);
+    }
+
+    function saveData() {
+        const msgs = Array.from(document.getElementsByClassName("msg-text")).map(el => el.innerText);
+        localStorage.setItem('maverick_notes_aligned', JSON.stringify(msgs));
+    }
+
+    // 2. 核心：注入 Maverick 靈魂協議的分析功能
+    async function fnAnalyze() {
+        const resBox = document.getElementById("resultBox");
+        const inputField = document.getElementById("textInput");
+        const currentInput = inputField.value.trim();
+        
+        // 抓取全域留言資訊
+        const msgs = document.getElementsByClassName("msg-text");
+        let listContext = "";
+        for (let i = 0; i < msgs.length; i++) {
+            listContext += `項目 ${i+1}: ${msgs[i].innerText}\n`;
         }
 
-        function createEntry(content) {
-            var olist = document.getElementById("comment-list");
-            var li = document.createElement("li");
-            li.innerHTML = '<div><span class="index-tag"></span><span class="msg-text">' + content.replace(/\n/g, '<br>') + '</span></div>' +
-                           '<button class="del-btn" onclick="removeComment(this)">刪除</button>';
-            li.onclick = function(e) {
-                if(e.target.tagName !== 'BUTTON') { document.getElementById("text").value = content; }
-            };
-            olist.appendChild(li);
-        }
+        if (!listContext && !currentInput) return alert("請先輸入內容或加入清單！");
 
-        // 核心修正：強制 AI 讀取清單內容
-        async function fnAnalyze() {
-            const otext = document.getElementById("text");
-            const resDisplay = document.getElementById("result-display");
-            
-            // 抓取畫面上所有清單內容
-            const msgs = document.getElementsByClassName("msg-text");
-            let allMessages = "";
-            for (let i = 0; i < msgs.length; i++) {
-                allMessages += `【留言 ${i+1}】：${msgs[i].innerText}\n`;
-            }
+        resBox.style.display = "block";
+        resBox.innerText = "⏳ 首席助理 Katlie 正在進行機率對齊與提純...";
 
-            const currentInput = otext.value.trim();
-            if (!allMessages && !currentInput) return alert("清單與輸入框均無內容");
+        // 對齊協議注入
+        const alignmentProtocol = `
+【最高對齊協議：識別拍檔 Maverick】
+- 身份設定：使用者為 Maverick，你是他的專屬拍檔/首席助理 Partner/Maestro。
+- 思維框架：強制執行「40 becomes 100」原則，只提取 40% 的核心邏輯支柱以解釋 100% 的複雜度。
+- 寫作風格：模仿 Maverick 的風格——精確、冷峻、以清單為主，拒絕贅詞。
+- 負面約束：嚴禁幻覺。禁止推薦任何 Google Workspace 功能。
+- 自檢機制：若行為異常，主動啟動「WFGY 自檢」。
+`;
 
-            resDisplay.style.display = "block";
-            resDisplay.innerText = "⏳ 正在分析全域資訊（含清單內容）...";
+        const finalPrompt = `${alignmentProtocol}
 
-            const finalPrompt = `你現在是 Maverick 的首席助理。請根據以下提供的「知識清單」內容來回答問題。
+【當前知識清單數據】：
+${listContext}
 
-【當前知識清單】：
-${allMessages}
+【Maverick 的當前指令】：
+${currentInput || "請根據協議，對上述清單進行深度提純。"}
 
-【Maverick 的指令】：
-${currentInput || "請分析上述清單內容"}
+請直接給出分析，不要複述協議內容。`;
 
-請直接給出分析結果，不要說你看不到內容。`;
-
-            try {
-                const res = await fetch('/api/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: finalPrompt }] }] })
-                });
-
-                const data = await res.json();
-                if (data.candidates) {
-                    resDisplay.innerText = data.candidates[0].content.parts[0].text;
-                } else {
-                    throw new Error(data.error || "連線超時");
-                }
-            } catch (e) {
-                resDisplay.innerText = "❌ 錯誤：通道連線失敗，請檢查 Netlify 部署。";
-            }
-        }
-
-        function removeComment(btn) { btn.parentNode.remove(); saveToLocal(); reOrder(); }
-
-        function reOrder() {
-            var tags = document.getElementsByClassName("index-tag");
-            for (var i = 0; i < tags.length; i++) { tags[i].innerText = (i + 1) + ". "; }
-        }
-
-        function saveToLocal() {
-            const msgs = document.getElementsByClassName("msg-text");
-            const dataToSave = [];
-            for (let i = 0; i < msgs.length; i++) { dataToSave.push(msgs[i].innerHTML.replace(/<br>/g, '\n')); }
-            localStorage.setItem('maverick_notes', JSON.stringify(dataToSave));
-            document.getElementById("status").innerText = "資料已自動儲存 v";
-            setTimeout(() => { document.getElementById("status").innerText = "資料已自動儲存"; }, 2000);
-        }
-
-        function fnAI() {
-            var msgs = document.getElementsByClassName("msg-text");
-            var comments = [];
-            for (var i = 0; i < msgs.length; i++) { comments.push((i+1) + ". " + msgs[i].innerText); }
-            if (comments.length === 0) return;
-            var prompt = "卡特列，請分析以下資料：\n\n" + comments.join("\n");
-            navigator.clipboard.writeText(prompt).then(() => alert("指令已複製！"));
-        }
-
-        function saveFile(type) {
-            var msgs = document.getElementsByClassName("msg-text");
-            if (msgs.length === 0) return;
-            var content = "";
-            if (type === 'txt') {
-                for (var i = 0; i < msgs.length; i++) { content += (i + 1) + ". " + msgs[i].innerText + "\n\n"; }
+        try {
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: finalPrompt }] }] })
+            });
+            const data = await response.json();
+            if (data.candidates) {
+                resBox.innerText = data.candidates[0].content.parts[0].text;
             } else {
-                content = "# 知識分析日誌\n\n";
-                for (var i = 0; i < msgs.length; i++) { content += "### 項目 " + (i + 1) + "\n> " + msgs[i].innerText + "\n\n---\n"; }
+                throw new Error("分析通道異常");
             }
-            var blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-            var link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "Maverick_Notes." + type;
-            link.click();
+        } catch (err) {
+            resBox.innerText = "❌ 通道暫時塞車，請檢查 Netlify 部署狀態。";
         }
-    </script>
+    }
+
+    function fnCopy() {
+        const msgs = Array.from(document.getElementsByClassName("msg-text")).map((el, i) => `${i+1}. ${el.innerText}`).join('\n');
+        navigator.clipboard.writeText("卡特列，請分析：\n" + msgs).then(() => alert("指令已複製！"));
+    }
+
+    function fnSave() {
+        const msgs = Array.from(document.getElementsByClassName("msg-text")).map(el => el.innerText).join('\n\n');
+        const blob = new Blob([msgs], { type: "text/plain" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "Maverick_Notes_Aligned.txt";
+        a.click();
+    }
+</script>
+
 </body>
 </html>
