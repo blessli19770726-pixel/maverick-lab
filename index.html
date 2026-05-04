@@ -16,15 +16,22 @@
             --washi-gold: #e2d1b1;
         }
 
-        body { 
+body { 
             font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background-color: var(--sakura-pink);
-            /* 加入淡淡的水墨櫻花背景氛圍 */
-            background-image: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.5) 0%, transparent 20%),
-                              radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.4) 0%, transparent 25%);
+            
+            /* 這裡呼叫你剛上傳的櫻花圖片，並加上一層淡淡的白紗遮罩讓文字清楚 */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)),
+                url('./sakura_bg.jpg');
+            
+            background-size: cover;       /* 讓圖片填滿全螢幕 */
+            background-position: center;  /* 圖片置中 */
+            background-attachment: fixed; /* 滾動時背景固定不動，增加高級感 */
+            
             display: flex; 
             justify-content: center; 
-            align-items: flex-start; /* 確保長內容時不會跑位 */
+            align-items: flex-start; 
             padding: 60px 20px; 
             margin: 0;
             min-height: 100vh;
