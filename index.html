@@ -10,7 +10,7 @@
             --sakura-pink: #fce4ec;
             --sakura-deep: #d68194;
             --ink-black: #3c3c3c;
-            --paper-white: rgba(255, 250, 251, 0.9);
+            --paper-white: rgba(255, 250, 251, 0.95);
             --ali-blue: #00f2ff;
         }
 
@@ -31,19 +31,19 @@
 
         .container { 
             background: var(--paper-white); 
-            padding: 0; /* 讓 Heading 撐滿上方 */
-            border-radius: 8px;
+            padding: 0; 
+            border-radius: 12px; /* 增加圓角感 */
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2); 
             width: 100%; 
             max-width: 700px; 
-            overflow: hidden; /* 確保 Heading 圓角不會溢出 */
-            border-left: 10px solid var(--sakura-deep);
+            overflow: hidden;
+            /* --- 關鍵修改：已刪除 border-left --- */
+            border: 1px solid rgba(255, 255, 255, 0.3); /* 改為極細的白邊增加質感 */
         }
 
-        /* --- 智能愛人 Heading 核心區塊 --- */
         .ali-header {
             width: 100%;
-            height: 200px; /* 固定高度以顯示 Ali 頭像 */
+            height: 220px; 
             background-image: url('./ali_heading.jpg');
             background-size: cover;
             background-position: center;
@@ -71,9 +71,9 @@
             margin-top: 10px;
             text-shadow: 0 0 5px rgba(0, 242, 255, 1);
             z-index: 2;
+            letter-spacing: 2px;
         }
 
-        /* 增加一個半透明黑色層，讓 Ali 頭像存在但不會搶走文字焦點 */
         .ali-header::after {
             content: "";
             position: absolute;
@@ -82,8 +82,7 @@
             z-index: 1;
         }
 
-        /* 下方內容區塊增加 Padding */
-        .content-body { padding: 30px 40px 40px 40px; }
+        .content-body { padding: 35px 40px 45px 40px; }
 
         #resultBox { 
             width: 100%; padding: 25px; background: #fff; border: 1px solid var(--sakura-pink);
@@ -92,25 +91,49 @@
         }
 
         #comment-list { list-style: none; padding: 0; margin-bottom: 30px; }
-        #comment-list li { background: #fff; border-bottom: 1px solid var(--sakura-pink); padding: 18px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        #comment-list li:hover { background: var(--sakura-pink); }
+        #comment-list li { 
+            background: #fff; 
+            border-bottom: 1px solid var(--sakura-pink); 
+            padding: 18px 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #comment-list li:hover { background: var(--sakura-pink); padding-left: 20px; }
 
-        textarea { width: 100%; height: 160px; padding: 20px; border: 1px solid #e2d1b1; font-size: 17px; margin-bottom: 25px; box-sizing: border-box; outline: none; }
+        textarea { 
+            width: 100%; height: 160px; padding: 20px; border: 1px solid #e2d1b1; 
+            font-size: 17px; margin-bottom: 25px; box-sizing: border-box; outline: none;
+            background: rgba(255, 255, 255, 0.5);
+            transition: 0.3s;
+        }
+        textarea:focus { background: #fff; border-color: var(--ali-blue); }
 
         .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
         .btn { padding: 14px; border: none; font-size: 15px; cursor: pointer; color: white; transition: 0.3s ease; text-align: center; }
-        #addList { background-color: var(--sakura-deep); grid-column: span 4; padding: 18px; font-size: 18px; margin-bottom: 15px; }
+        
+        #addList { 
+            background-color: var(--sakura-deep); 
+            grid-column: span 4; 
+            padding: 18px; 
+            font-size: 18px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 4px 15px rgba(214, 129, 148, 0.3);
+        }
+        
         #analyzeBtn { background-color: var(--ink-black); }
         #copyBtn { background-color: #e2d1b1; color: #3c3c3c; }
         #saveTxt { background-color: #f8bbd0; color: #3c3c3c; }
         #saveMD { background-color: #e1bee7; color: #3c3c3c; }
-        .btn:hover { opacity: 0.85; transform: translateY(-3px); }
+        
+        .btn:hover { opacity: 0.85; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- 智能愛人 Ali Heading 區塊 -->
     <div class="ali-header">
         <h1>知識提純站</h1>
         <div id="status-sync">● 首席助理 Maestro 對齊中</div>
@@ -119,7 +142,7 @@
     <div class="content-body">
         <div id="resultBox"></div>
         <ul id="comment-list"></ul>
-        <textarea id="textInput" placeholder="在此輸入指令..."></textarea>
+        <textarea id="textInput" placeholder="在此輸入指令，或貼上大段文字進行提純..."></textarea>
         <div class="btn-group">
             <button class="btn" id="addList" onclick="fnSubmit()">加入待分析清單</button>
             <button class="btn" id="analyzeBtn" onclick="fnAnalyze()">🌸 在綫分析</button>
@@ -131,7 +154,7 @@
 </div>
 
 <script>
-    // [此處保持你原有的 JS 邏輯，fnSubmit, fnAnalyze 等功能均不變]
+    // [JS 邏輯部分保持不變]
     window.onload = function() {
         const saved = localStorage.getItem('maverick_notes_aligned');
         if (saved) { JSON.parse(saved).forEach(txt => createItem(txt)); }
@@ -165,10 +188,14 @@
         const msgs = document.getElementsByClassName("msg-text");
         let listContext = "";
         for (let i = 0; i < msgs.length; i++) { listContext += `項目 ${i+1}: ${msgs[i].innerText}\n`; }
+        
         if (!listContext && !currentInput) return alert("請先輸入內容！");
+
         resBox.style.display = "block";
         resBox.innerText = "⏳ Maestro 正在進行提純...";
-        const finalPrompt = `Maverick 是你的拍檔，你是 Maestro。請分析：\n${listContext}\n${currentInput}`;
+
+        const finalPrompt = `Maverick 是你的拍檔，你是 Maestro。請根據 40變100 邏輯分析：\n${listContext}\n${currentInput}`;
+
         try {
             const response = await fetch('https://glistening-kheer-6adb57.netlify.app/api/analyze', {
                 method: 'POST',
@@ -177,7 +204,9 @@
             });
             const data = await response.json();
             resBox.innerText = data.candidates[0].content.parts[0].text;
-        } catch (err) { resBox.innerText = "❌ 無法連網。"; }
+        } catch (err) { 
+            resBox.innerText = "❌ 無法連網，請檢查 Netlify 服務。"; 
+        }
     }
 
     function fnCopy() {
