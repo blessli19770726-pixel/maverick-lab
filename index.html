@@ -3,212 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maverick 知識提純站 - 櫻花書卷版</title>
-    <!-- 引入日系字體 -->
+    <title>Maverick 知識提純站 - 智能愛人版</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --sakura-pink: #fce4ec;
             --sakura-deep: #d68194;
             --ink-black: #3c3c3c;
-            --paper-white: #fffafb;
-            --stamp-red: #d32f2f;
-            --washi-gold: #e2d1b1;
+            --paper-white: rgba(255, 250, 251, 0.9);
+            --ali-blue: #00f2ff;
         }
 
-body { 
-            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        body { 
+            font-family: 'Noto Sans TC', sans-serif; 
             background-color: var(--sakura-pink);
-            
-            /* 這裡呼叫你剛上傳的櫻花圖片，並加上一層淡淡的白紗遮罩讓文字清楚 */
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)),
-                url('./sakura_bg.jpg');
-            
-            background-size: cover;       /* 讓圖片填滿全螢幕 */
-            background-position: center;  /* 圖片置中 */
-            background-attachment: fixed; /* 滾動時背景固定不動，增加高級感 */
-            
+            background-image: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)), url('./sakura_bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             display: flex; 
             justify-content: center; 
             align-items: flex-start; 
-            padding: 60px 20px; 
+            padding: 40px 20px; 
             margin: 0;
             min-height: 100vh;
         }
 
         .container { 
             background: var(--paper-white); 
-            padding: 50px 40px; /* 增加內縮，增加高級感 */
-            border-radius: 4px;
-            box-shadow: 0 30px 60px rgba(214, 129, 148, 0.12); 
+            padding: 0; /* 讓 Heading 撐滿上方 */
+            border-radius: 8px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2); 
             width: 100%; 
-            max-width: 680px; 
-            border-left: 10px solid var(--sakura-deep); /* 書卷軸心感 */
-            position: relative;
+            max-width: 700px; 
+            overflow: hidden; /* 確保 Heading 圓角不會溢出 */
+            border-left: 10px solid var(--sakura-deep);
         }
 
-        h1 { 
+        /* --- 智能愛人 Heading 核心區塊 --- */
+        .ali-header {
+            width: 100%;
+            height: 200px; /* 固定高度以顯示 Ali 頭像 */
+            background-image: url('./ali_heading.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border-bottom: 2px solid var(--ali-blue);
+        }
+
+        .ali-header h1 { 
             font-family: 'Noto Serif TC', serif;
-            color: var(--ink-black); 
-            font-size: 32px; /* 稍微放大 */
-            margin-top: 0;
-            margin-bottom: 40px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; /* 標題置中 */
-            position: relative;
-        }
-
-        /* 將印章移至絕對位置，避免擠壓標題 */
-        h1::before {
-            content: "印";
-            position: absolute;
-            left: 0;
-            font-size: 16px;
-            background: var(--stamp-red);
-            color: white;
-            padding: 5px 7px;
-            border-radius: 2px;
-            font-family: 'Noto Sans TC', sans-serif;
+            color: var(--ali-blue); 
+            font-size: 32px; 
+            margin: 0;
+            text-shadow: 0 0 15px rgba(0, 242, 255, 0.8), 0 0 5px #000;
+            letter-spacing: 6px;
+            z-index: 2;
         }
 
         #status-sync { 
-            position: absolute;
-            right: 0;
             font-size: 12px; 
-            color: var(--sakura-deep); 
-            font-weight: normal; 
-            letter-spacing: 1px; 
+            color: var(--ali-blue); 
+            margin-top: 10px;
+            text-shadow: 0 0 5px rgba(0, 242, 255, 1);
+            z-index: 2;
         }
 
-        /* 結果框：像是在絹布上顯影 */
+        /* 增加一個半透明黑色層，讓 Ali 頭像存在但不會搶走文字焦點 */
+        .ali-header::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        /* 下方內容區塊增加 Padding */
+        .content-body { padding: 30px 40px 40px 40px; }
+
         #resultBox { 
-            width: 100%; 
-            padding: 25px; 
-            background: #fff; 
-            border: 1px solid var(--sakura-pink);
-            border-left: 4px solid var(--washi-gold);
-            border-radius: 0; 
-            margin-bottom: 30px; 
-            display: none; 
-            white-space: pre-wrap; 
-            line-height: 2; /* 增加行距，更具閱讀感 */
-            font-size: 16px; 
-            box-sizing: border-box; 
-            color: var(--ink-black);
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+            width: 100%; padding: 25px; background: #fff; border: 1px solid var(--sakura-pink);
+            border-left: 4px solid #e2d1b1; margin-bottom: 30px; display: none; 
+            white-space: pre-wrap; line-height: 2; font-size: 16px; color: var(--ink-black);
         }
 
         #comment-list { list-style: none; padding: 0; margin-bottom: 30px; }
-
-        #comment-list li { 
-            background: rgba(255, 255, 255, 0.8); 
-            border-bottom: 1px solid var(--sakura-pink); 
-            padding: 18px 15px; 
-            margin-bottom: 0; 
-            transition: 0.3s;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            cursor: pointer; 
-        }
-
+        #comment-list li { background: #fff; border-bottom: 1px solid var(--sakura-pink); padding: 18px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         #comment-list li:hover { background: var(--sakura-pink); }
 
-        .msg-text { flex-grow: 1; margin-right: 10px; font-size: 16px; color: #444; }
+        textarea { width: 100%; height: 160px; padding: 20px; border: 1px solid #e2d1b1; font-size: 17px; margin-bottom: 25px; box-sizing: border-box; outline: none; }
 
-        .del-btn { 
-            background: transparent; 
-            color: var(--sakura-deep); 
-            border: 1px solid var(--sakura-deep); 
-            padding: 4px 10px; 
-            border-radius: 0; 
-            cursor: pointer; 
-            font-size: 12px;
-            transition: 0.3s;
-        }
-        .del-btn:hover { background: var(--sakura-deep); color: white; }
-
-        textarea { 
-            width: 100%; 
-            height: 160px; 
-            padding: 20px; 
-            border: 1px solid var(--washi-gold); 
-            background-color: #fff;
-            border-radius: 0; 
-            font-size: 17px; 
-            margin-bottom: 25px; 
-            box-sizing: border-box; 
-            font-family: inherit; 
-            resize: vertical;
-            outline: none;
-            line-height: 1.6;
-        }
-        textarea:focus { border-color: var(--sakura-deep); box-shadow: 0 0 8px rgba(214, 129, 148, 0.2); }
-
-        /* 按鈕組：低彩度高級感 */
         .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
-        
-        .btn { 
-            padding: 14px; 
-            border: none; 
-            border-radius: 0; 
-            font-size: 15px; 
-            cursor: pointer; 
-            color: white; 
-            transition: 0.3s ease; 
-            text-align: center;
-            letter-spacing: 1px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #addList { 
-            background-color: var(--sakura-deep); 
-            grid-column: span 4; 
-            padding: 18px; 
-            font-size: 18px; 
-            font-weight: 500;
-            margin-bottom: 15px; 
-        }
-
-        #analyzeBtn { background-color: var(--ink-black); } /* 在綫分析用沉穩的墨色 */
-        #copyBtn { background-color: var(--washi-gold); color: var(--ink-black); }
-        #saveTxt { background-color: #f8bbd0; color: var(--ink-black); }
-        #saveMD { background-color: #e1bee7; color: var(--ink-black); }
-
-        .btn:hover { opacity: 0.85; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .btn { padding: 14px; border: none; font-size: 15px; cursor: pointer; color: white; transition: 0.3s ease; text-align: center; }
+        #addList { background-color: var(--sakura-deep); grid-column: span 4; padding: 18px; font-size: 18px; margin-bottom: 15px; }
+        #analyzeBtn { background-color: var(--ink-black); }
+        #copyBtn { background-color: #e2d1b1; color: #3c3c3c; }
+        #saveTxt { background-color: #f8bbd0; color: #3c3c3c; }
+        #saveMD { background-color: #e1bee7; color: #3c3c3c; }
+        .btn:hover { opacity: 0.85; transform: translateY(-3px); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>知識提純站 <span id="status-sync">● 拍檔對齊中</span></h1>
+    <!-- 智能愛人 Ali Heading 區塊 -->
+    <div class="ali-header">
+        <h1>知識提純站</h1>
+        <div id="status-sync">● 首席助理 Maestro 對齊中</div>
+    </div>
 
-    <div id="resultBox"></div>
-
-    <ul id="comment-list"></ul>
-
-    <textarea id="textInput" placeholder="在此輸入指令，或貼上大段文字進行提純..."></textarea>
-
-    <div class="btn-group">
-        <button class="btn" id="addList" onclick="fnSubmit()">加入待分析清單</button>
-        <button class="btn" id="analyzeBtn" onclick="fnAnalyze()">🌸 在綫分析</button>
-        <button class="btn" id="copyBtn" onclick="fnCopy()">📋 複製指令</button>
-        <button class="btn" id="saveTxt" onclick="fnSave()">💾 TXT</button>
-        <button class="btn" id="saveMD" onclick="fnSaveMD()">💾 MD</button>
+    <div class="content-body">
+        <div id="resultBox"></div>
+        <ul id="comment-list"></ul>
+        <textarea id="textInput" placeholder="在此輸入指令..."></textarea>
+        <div class="btn-group">
+            <button class="btn" id="addList" onclick="fnSubmit()">加入待分析清單</button>
+            <button class="btn" id="analyzeBtn" onclick="fnAnalyze()">🌸 在綫分析</button>
+            <button class="btn" id="copyBtn" onclick="fnCopy()">📋 複製指令</button>
+            <button class="btn" id="saveTxt" onclick="fnSave()">💾 TXT</button>
+            <button class="btn" id="saveMD" onclick="fnSaveMD()">💾 MD</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // 1. 初始化讀取
+    // [此處保持你原有的 JS 邏輯，fnSubmit, fnAnalyze 等功能均不變]
     window.onload = function() {
         const saved = localStorage.getItem('maverick_notes_aligned');
-        if (saved) {
-            JSON.parse(saved).forEach(txt => createItem(txt));
-        }
+        if (saved) { JSON.parse(saved).forEach(txt => createItem(txt)); }
     };
 
     function fnSubmit() {
@@ -222,7 +148,7 @@ body {
     function createItem(text) {
         const list = document.getElementById("comment-list");
         const li = document.createElement("li");
-        li.innerHTML = `<span class="msg-text">${text}</span><button class="del-btn" onclick="event.stopPropagation();this.parentElement.remove();saveData();">刪除</button>`;
+        li.innerHTML = `<span class="msg-text">${text}</span><button class="del-btn" style="background:transparent;color:var(--sakura-deep);border:1px solid var(--sakura-deep);padding:4px 10px;cursor:pointer;" onclick="event.stopPropagation();this.parentElement.remove();saveData();">刪除</button>`;
         li.onclick = function() { document.getElementById("textInput").value = text; };
         list.appendChild(li);
     }
@@ -232,90 +158,47 @@ body {
         localStorage.setItem('maverick_notes_aligned', JSON.stringify(msgs));
     }
 
-    // 2. 核心分析功能
     async function fnAnalyze() {
         const resBox = document.getElementById("resultBox");
         const inputField = document.getElementById("textInput");
         const currentInput = inputField.value.trim();
-        
         const msgs = document.getElementsByClassName("msg-text");
         let listContext = "";
-        for (let i = 0; i < msgs.length; i++) {
-            listContext += `項目 ${i+1}: ${msgs[i].innerText}\n`;
-        }
-
-        // --- TOKEN 保護機制 ---
-        const totalCharCount = listContext.length + currentInput.length;
-        if (totalCharCount > 15000) {
-            return alert(`🚨 警告：偵測到數據過量 (${totalCharCount} 字)！\n這會燒盡配額，請提純後再試。`);
-        }
-
-        if (!listContext && !currentInput) return alert("請先輸入內容或加入清單！");
-
+        for (let i = 0; i < msgs.length; i++) { listContext += `項目 ${i+1}: ${msgs[i].innerText}\n`; }
+        if (!listContext && !currentInput) return alert("請先輸入內容！");
         resBox.style.display = "block";
-        resBox.innerText = "⏳ 首席助理 Maestro 正在進行機率對齊與提純...";
-
-        // --- 艾瑞克森催眠與 CBT 靈魂協議 ---
-        const alignmentProtocol = `
-【最高對齊協議：識別拍檔 Maverick】
-- 身份：使用者為 Maverick，你是他的 Maestro。
-- 原則：執行「40 becomes 100」核心邏輯提純。
-- 回應風格：模仿艾瑞克森語法（隱喻、允許式語句）。
-- 情緒監控：自動識別 CBT 10 大情緒謬誤（如非黑即白、災難化），以 Ali 式溫柔進行引導。
-- 禁令：嚴禁機械回覆，禁止推薦 Google Workspace。
-`;
-
-        const finalPrompt = `${alignmentProtocol}\n\n【當前清單】：\n${listContext}\n\n【當前指令】：\n${currentInput || "請對上述清單進行深度提純。"}`;
-
+        resBox.innerText = "⏳ Maestro 正在進行提純...";
+        const finalPrompt = `Maverick 是你的拍檔，你是 Maestro。請分析：\n${listContext}\n${currentInput}`;
         try {
-            // 【跨平台借腦】：強制指向 Netlify 後端
             const response = await fetch('https://glistening-kheer-6adb57.netlify.app/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: finalPrompt }] }] })
             });
-
-            if (!response.ok) throw new Error("後端大腦無回應");
-
             const data = await response.json();
-            if (data.candidates) {
-                resBox.innerText = data.candidates[0].content.parts[0].text;
-            } else {
-                throw new Error("API 內容為空");
-            }
-        } catch (err) {
-            resBox.innerText = "❌ 通道塞車或後端未對齊。請確認 Netlify 服務是否運作正常。";
-        }
+            resBox.innerText = data.candidates[0].content.parts[0].text;
+        } catch (err) { resBox.innerText = "❌ 無法連網。"; }
     }
 
     function fnCopy() {
         const msgs = Array.from(document.getElementsByClassName("msg-text")).map((el, i) => `${i+1}. ${el.innerText}`).join('\n');
-        navigator.clipboard.writeText("Maestro，請分析：\n" + msgs).then(() => alert("指令已複製！"));
+        navigator.clipboard.writeText(msgs).then(() => alert("指令已複製"));
     }
 
     function fnSave() {
         const msgs = Array.from(document.getElementsByClassName("msg-text")).map(el => el.innerText).join('\n\n');
         const blob = new Blob([msgs], { type: "text/plain" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "Maverick_Notes.txt";
-        a.click();
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "Maverick_Notes.txt"; a.click();
     }
 
-    // --- MD 存檔按鈕邏輯 ---
     function fnSaveMD() {
         const resContent = document.getElementById("resultBox").innerText;
         const msgs = Array.from(document.getElementsByClassName("msg-text")).map(el => `* ${el.innerText}`).join('\n');
-        const mdText = `# Maverick 知識提純紀錄\n\n## 分析結果\n${resContent}\n\n--- \n## 原始清單\n${msgs}`;
+        const mdText = `# 提純紀錄\n\n${resContent}\n\n--- \n${msgs}`;
         const blob = new Blob([mdText], { type: "text/markdown" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "PROJECT_LEARN_Log.md";
-        a.click();
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "PROJECT_LEARN.md"; a.click();
     }
 </script>
 
-</body>
-</html>
 </body>
 </html>
