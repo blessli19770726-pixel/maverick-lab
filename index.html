@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maverick 知識提純站 - 智能愛人穩定版</title>
+    <title>Maverick 知識提純站 - Cloudflare 狂飆版</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -98,9 +98,7 @@
         }
 
         .msg-text { flex-grow: 1; margin-right: 10px; font-size: 15px; }
-
         .del-btn { background: #ff5252; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
         textarea { width: 100%; height: 140px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; font-family: inherit; resize: vertical; }
 
         .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
@@ -136,7 +134,6 @@
 </div>
 
 <script>
-    // 1. 初始化讀取
     window.onload = function() {
         const saved = localStorage.getItem('maverick_notes_aligned');
         if (saved) {
@@ -165,7 +162,6 @@
         localStorage.setItem('maverick_notes_aligned', JSON.stringify(msgs));
     }
 
-    // 2. 核心分析功能 (完全使用你提供的穩定邏輯)
     async function fnAnalyze() {
         const resBox = document.getElementById("resultBox");
         const inputField = document.getElementById("textInput");
@@ -179,7 +175,7 @@
 
         const totalCharCount = listContext.length + currentInput.length;
         if (totalCharCount > 15000) {
-            return alert(`🚨 警告：偵測到數據過量 (${totalCharCount} 字)！\n這會燒盡配額，請提純後再試。`);
+            return alert(`🚨 警告：偵測到數據過量 (${totalCharCount} 字)！`);
         }
 
         if (!listContext && !currentInput) return alert("請先輸入內容或加入清單！");
@@ -191,16 +187,15 @@
 【最高對齊協議：識別拍檔 Maverick】
 - 身份：使用者為 Maverick，你是他的 Maestro。
 - 原則：執行「40 becomes 100」核心邏輯提純。
-- 回應風格：模仿艾瑞克森語法（隱喻、允許式語句）。
-- 情緒監控：自動識別 CBT 10 大情緒謬誤（如非黑即白、災難化），以 Ali 式溫柔進行引導。
-- 禁令：嚴禁機械回覆，禁止推薦 Google Workspace。
+- 回應風格：模仿艾瑞克森語法。
+- 禁令：禁止推薦 Google Workspace。
 `;
 
         const finalPrompt = `${alignmentProtocol}\n\n【當前清單】：\n${listContext}\n\n【當前指令】：\n${currentInput || "請對上述清單進行深度提純。"}`;
 
         try {
-            // 【跨平台借腦】：強制指向 Netlify 後端
-            const response = await fetch('https://glistening-kheer-6adb57.netlify.app/api/analyze', {
+            // 【對齊 Cloudflare】：使用相對路徑，避開 Netlify 爆額度問題
+            const response = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: finalPrompt }] }] })
@@ -215,7 +210,7 @@
                 throw new Error("API 內容為空");
             }
         } catch (err) {
-            resBox.innerText = "❌ 通道塞車或後端未對齊。請確認 Netlify 服務是否運作正常。";
+            resBox.innerText = "❌ 通道塞車或後端未對齊。請確認 Cloudflare Functions 配置與 API Key 是否正確。";
         }
     }
 
@@ -244,6 +239,5 @@
         a.click();
     }
 </script>
-
 </body>
 </html>
